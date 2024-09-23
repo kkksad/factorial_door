@@ -1,36 +1,23 @@
-import logging
-import requests
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType
+from homeassistant import config_entries
+from homeassistant.core import callback
+import voluptuous as vol
 
-_LOGGER = logging.getLogger(__name__)
+from . import DOMAIN
 
-DOMAIN = "ufanet_door"
+class UfanetDoorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    VERSION = 1
 
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    hass.services.async_register(DOMAIN, 'open_door', open_door)
-    return True
+    async def async_step_user(self, user_input=None):
+        errors = {}
+        if user_input is not None:
+            return self.async_create_entry(title="Ufanet Door", data=user_input)
 
-def get_session_id(login, password):
-    login_url = 'https://dom.ufanet.ru/login/'
-    data = {
-        'contract': login,
-        'password': password
-    }
-    session = requests.Session()
-    response = session.post(login_url, data=data)
-    if response.status_code == 200:
-        cookies = session.cookies
-        sessionid = cookies.get('sessionid')
-        if sessionid:
-            return sessionid
+        data_schema = vol.Schema({
+            vol.Required("login"): str,
+            vol.Required("password"): str,
+            vol.Required("domf_id"): int,
+        })
 
-def open_door(call):
-    login = call.data.get('login')
-    password = call.data.get('password')
-    domf_id = call.data.get('domf_id')
-    sessionid = get_session_id(login, password)
-    url = f'https://dom.ufanet.ru/api/v0/skud/shared/{domf_id}/open/'
-    coc = {'sessionid': f'{sessionid}'}
-    response = requests.Session().get(url=url, cookies=coc)
-    _LOGGER.info(response.json()["result"])
+        return self.async_show_form(
+            step_id="user", data_schema=data_schema, errors=errors
+        )
