@@ -1,0 +1,10 @@
+{
+    "domain": "factorial_door",
+    "name": "factorial_door",
+    "version": "1.0.0",
+    "author": "factorial_doore",
+    "description": "factorial_door.",
+    "category": "Integration",
+    "dependencies": [],
+    "min_ha_version": "2022.4.0"
+}
