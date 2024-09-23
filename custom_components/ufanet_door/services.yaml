@@ -1,0 +1,12 @@
+open_door:
+  description: Open the door
+  fields:
+    login:
+      description: Login
+      example: "factsM000000"
+    password:
+      description: Password
+      example: "9101360000"
+    domf_id:
+      description: DOMF ID
+      example: 823000
